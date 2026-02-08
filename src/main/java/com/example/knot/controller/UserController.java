@@ -2,8 +2,8 @@ package com.example.knot.controller;
 
 import com.example.knot.dto.RegisterUserRequest;
 import com.example.knot.dto.UserResponse;
-import com.example.knot.entity.User;
 import com.example.knot.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +20,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public UserResponse registerUser(@RequestBody RegisterUserRequest  request) {
+    public UserResponse registerUser(@Valid @RequestBody RegisterUserRequest  request) {
         return userService.registerUser(request);
     }
 

@@ -3,6 +3,7 @@ package com.example.knot.service;
 import com.example.knot.dto.RegisterUserRequest;
 import com.example.knot.dto.UserResponse;
 import com.example.knot.entity.User;
+import com.example.knot.exception.EmailAlreadyExistsException;
 import com.example.knot.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,7 @@ public class UserService {
     public UserResponse registerUser(RegisterUserRequest request) {
 
         if(userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("User already exists");
+            throw new EmailAlreadyExistsException("User already exists");
         }
 
         User user = User.builder()
