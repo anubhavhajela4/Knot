@@ -1,6 +1,7 @@
 package com.example.knot.service;
 
 import com.example.knot.dto.RegisterUserRequest;
+import com.example.knot.dto.UpdateUserRequest;
 import com.example.knot.dto.UserResponse;
 import com.example.knot.entity.User;
 import com.example.knot.exception.EmailAlreadyExistsException;
@@ -67,6 +68,27 @@ public class UserService {
                         .build()
                 )
                 .toList();
+    }
+
+    public UserResponse updateUser(UUID id, UpdateUserRequest request) {
+
+        User user = userRepository.findById(id).orElseThrow(()->new UserNotFoundException("User Not Found"));
+        user.setBio(request.getBio());
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        User updatedUser = userRepository.save(user);
+        return UserResponse.builder()
+                .id(updatedUser.getId())
+                .name(updatedUser.getName())
+                .email(updatedUser.getEmail())
+                .bio(updatedUser.getBio())
+                .createdAt(updatedUser.getCreatedAt())
+                .build();
+    }
+
+    public void deleteUser(UUID id) {
+        User user = userRepository.findById(id).orElseThrow(()->new UserNotFoundException("User Not Found"));
+        userRepository.delete(user);
     }
 
 }
