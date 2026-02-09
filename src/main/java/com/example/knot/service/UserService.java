@@ -4,8 +4,12 @@ import com.example.knot.dto.RegisterUserRequest;
 import com.example.knot.dto.UserResponse;
 import com.example.knot.entity.User;
 import com.example.knot.exception.EmailAlreadyExistsException;
+import com.example.knot.exception.UserNotFoundException;
 import com.example.knot.repository.UserRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -40,4 +44,29 @@ public class UserService {
                 .build();
 
     }
+
+    public UserResponse getUserById(UUID id) {
+        User user = userRepository.findById(id).orElseThrow(()->new UserNotFoundException("User Not Found"));
+        return UserResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .bio(user.getBio())
+                .createdAt(user.getCreatedAt())
+                .build();
+    }
+
+    public List<UserResponse> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(user -> UserResponse.builder()
+                        .id(user.getId())
+                        .name(user.getName())
+                        .bio(user.getBio())
+                        .createdAt(user.getCreatedAt())
+                        .build()
+                )
+                .toList();
+    }
+
 }

@@ -4,10 +4,10 @@ import com.example.knot.dto.RegisterUserRequest;
 import com.example.knot.dto.UserResponse;
 import com.example.knot.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -24,5 +24,14 @@ public class UserController {
         return userService.registerUser(request);
     }
 
+    @GetMapping("/{id}")
+    public UserResponse getUserById(@PathVariable UUID id) {
+        return userService.getUserById(id);
+    }
+
+    @GetMapping
+    public List<UserResponse> getAllUsers() {
+        return userService.getAllUsers();
+    }
 
 }

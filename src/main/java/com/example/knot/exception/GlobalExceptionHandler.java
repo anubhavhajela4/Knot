@@ -29,4 +29,13 @@ public class GlobalExceptionHandler {
               .timestamp(LocalDateTime.now())
               .build();
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleUserNotFoundException(UserNotFoundException ex) {
+        return ErrorResponse.builder()
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 }
