@@ -4,7 +4,9 @@ import com.example.knot.dto.RegisterUserRequest;
 import com.example.knot.dto.UpdateUserRequest;
 import com.example.knot.dto.UserResponse;
 import com.example.knot.entity.User;
+import com.example.knot.exception.AlreadyFollowingException;
 import com.example.knot.exception.EmailAlreadyExistsException;
+import com.example.knot.exception.NotFollowingException;
 import com.example.knot.exception.UserNotFoundException;
 import com.example.knot.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -88,18 +90,66 @@ public class UserService {
     }
 
     public void deleteUser(UUID id) {
-        User user = userRepository.findById(id).orElseThrow(()->new UserNotFoundException("User Not Found"));
+        User user = userRepository.findById(id)
+                .orElseThrow(()->new UserNotFoundException("User Not Found"));
         userRepository.delete(user);
     }
 
     public void followUser(UUID userId, UUID targetId) {
-        if(userId.equals(targetId)) {}
+        if(userId.equals(targetId)) {
+            throw new RuntimeException("You can't follow yourself");
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(()->new UserNotFoundException("User Not Found"));
         User targetUser = userRepository.findById(targetId)
                 .orElseThrow(()->new UserNotFoundException("Target User Not Found"));
+        if(user.getFollowing().contains(targetUser)) {
+            throw new AlreadyFollowingException("You can't follow the same user twice");
+        }
         user.getFollowing().add(targetUser);
         userRepository.save(user);
+    }
+
+    public void unfollowUser(UUID userId, UUID targetId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()->new UserNotFoundException("User Not Found"));
+        User targetUser = userRepository.findById(targetId)
+                .orElseThrow(()->new UserNotFoundException("Target User Not Found"));
+        if(!user.getFollowing().contains(targetUser)) {
+            throw new NotFollowingException("You are not following this user");
+        }
+        user.getFollowing().remove(targetUser);
+        userRepository.save(user);
+    }
+
+    public List<UserResponse> getFollowers(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(()->new UserNotFoundException("User Not Found"));
+        return user.getFollowers()
+                .stream()
+                .map(user1 -> UserResponse.builder()
+                        .id(user1.getId())
+                        .name(user1.getName())
+                        .email(user1.getEmail())
+                        .bio(user1.getBio())
+                        .createdAt(user1.getCreatedAt())
+                        .build())
+                .toList();
+    }
+
+    public List<UserResponse> getFollowing(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(()->new UserNotFoundException("User Not Found"));
+        return user.getFollowing()
+                .stream()
+                .map(user1-> UserResponse.builder()
+                        .id(user1.getId())
+                        .name(user1.getName())
+                        .email(user1.getEmail())
+                        .bio(user1.getBio())
+                        .createdAt(user1.getCreatedAt())
+                        .build())
+                .toList();
     }
 
 }

@@ -46,4 +46,26 @@ public class UserController {
         return "User Deleted Successfully";
     }
 
+    @PostMapping("{userId}/follow/{targetId}")
+    public String followUser(@PathVariable UUID userId,@PathVariable UUID targetId) {
+        userService.followUser(userId, targetId);
+        return "User Followed Successfully";
+    }
+
+    @DeleteMapping("{userId}/follow/{targetId}")
+    public String unfollowUser(@PathVariable UUID userId,@PathVariable UUID targetId) {
+        userService.unfollowUser(userId, targetId);
+        return "User Unfollowed Successfully";
+    }
+
+    @GetMapping("/{userId}/following")
+    public List<UserResponse> getFollowing(@PathVariable UUID userId) {
+        return userService.getFollowing(userId);
+    }
+
+    @GetMapping("/{userId}/followers")
+    public List<UserResponse> getFollowers(@PathVariable UUID userId) {
+        return userService.getFollowers(userId);
+    }
+
 }
