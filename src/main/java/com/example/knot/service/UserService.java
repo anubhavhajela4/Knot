@@ -63,6 +63,7 @@ public class UserService {
                 .map(user -> UserResponse.builder()
                         .id(user.getId())
                         .name(user.getName())
+                        .email(user.getEmail())
                         .bio(user.getBio())
                         .createdAt(user.getCreatedAt())
                         .build()
@@ -89,6 +90,16 @@ public class UserService {
     public void deleteUser(UUID id) {
         User user = userRepository.findById(id).orElseThrow(()->new UserNotFoundException("User Not Found"));
         userRepository.delete(user);
+    }
+
+    public void followUser(UUID userId, UUID targetId) {
+        if(userId.equals(targetId)) {}
+        User user = userRepository.findById(userId)
+                .orElseThrow(()->new UserNotFoundException("User Not Found"));
+        User targetUser = userRepository.findById(targetId)
+                .orElseThrow(()->new UserNotFoundException("Target User Not Found"));
+        user.getFollowing().add(targetUser);
+        userRepository.save(user);
     }
 
 }
