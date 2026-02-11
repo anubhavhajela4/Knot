@@ -5,8 +5,6 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -15,8 +13,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "posts")
-public class Post {
+@Table(name = "comments")
+public class Comment {
 
     @Id
     @GeneratedValue
@@ -26,21 +24,13 @@ public class Post {
     private String content;
 
     @CreationTimestamp
-    private LocalDateTime timestamp;
+    private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToMany
-    @JoinTable(
-            name = "post_likes",
-            joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private Set<User> likedBy = new HashSet<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private Set<Comment> comments = new HashSet<>();
-
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
 }

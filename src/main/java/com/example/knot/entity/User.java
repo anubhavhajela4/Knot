@@ -54,4 +54,7 @@ public class User {
     @ManyToMany(mappedBy = "likedBy")
     private Set<Post> likedPost = new HashSet<>();
 
+    @OneToMany(mappedBy =  "user" ,cascade = CascadeType.ALL)
+    private Set<Comment> comments = new HashSet<>();
+
 }
