@@ -4,6 +4,9 @@ import com.example.knot.dto.CreatePostRequest;
 import com.example.knot.dto.PostResponse;
 import com.example.knot.entity.Post;
 import com.example.knot.entity.User;
+import com.example.knot.exception.PostAlreadyLikedException;
+import com.example.knot.exception.PostNotFoundException;
+import com.example.knot.exception.UserNotFoundException;
 import com.example.knot.repository.PostRepository;
 import com.example.knot.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -51,6 +54,31 @@ public class PostService {
                         .build())
                 .toList();
 
+    }
+
+    public void likePost(UUID postId,UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User Not Found"));
+        Post post = postRepository.findById(postId).orElseThrow(()->new PostNotFoundException("Post Not Found"));
+        if(post.getLikedBy().contains(user)) {
+            throw new PostAlreadyLikedException("Post Already Liked");
+        }
+        post.getLikedBy().add(user);
+        postRepository.save(post);
+    }
+
+    public void unlikePost(UUID postId,UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User Not Found"));
+        Post post = postRepository.findById(postId).orElseThrow(()->new PostNotFoundException("Post NotFound"));
+        if(!post.getLikedBy().contains(user)) {
+            throw new RuntimeException("Post Not Liked");
+        }
+        post.getLikedBy().remove(user);
+        postRepository.save(post);
+    }
+
+    public int getLikeCount(UUID postId) {
+        Post post = postRepository.findById(postId).orElseThrow(()->new PostNotFoundException("Post Not Found"));
+        return post.getLikedBy().size();
     }
 
 

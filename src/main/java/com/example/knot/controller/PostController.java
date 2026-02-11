@@ -29,4 +29,21 @@ public class PostController {
     public List<PostResponse> getpostByUser(@PathVariable UUID userId) {
         return postService.getPostByUser(userId);
     }
+
+    @PostMapping("/{postId}/like/{userId}")
+    public String likePost(@PathVariable UUID postId, @PathVariable UUID userId) {
+        postService.likePost(postId, userId);
+        return "Post Liked";
+    }
+
+    @DeleteMapping("/{postId}/like/{userId}")
+    public String unlikePost(@PathVariable UUID postId, @PathVariable UUID userId) {
+        postService.unlikePost(postId, userId);
+        return "Post Unliked";
+    }
+
+    @GetMapping("/{postId}/likes")
+    public int getLikes(@PathVariable UUID postId) {
+        return postService.getLikeCount(postId);
+    }
 }
