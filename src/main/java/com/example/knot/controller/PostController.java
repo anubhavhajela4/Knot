@@ -46,4 +46,10 @@ public class PostController {
     public int getLikes(@PathVariable UUID postId) {
         return postService.getLikeCount(postId);
     }
+
+    @GetMapping("/feed/{userId}")
+    public List<PostResponse> getFeed(@PathVariable UUID userId) {
+        return postService.getFeed(userId);
+    }
+
 }

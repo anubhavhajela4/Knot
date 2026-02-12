@@ -81,5 +81,19 @@ public class PostService {
         return post.getLikedBy().size();
     }
 
+    public List<PostResponse> getFeed(UUID userId) {
+
+        return postRepository.findFeedPosts(userId)
+                .stream()
+                .map(post -> PostResponse.builder()
+                        .id(post.getId())
+                        .content(post.getContent())
+                        .createdAt(post.getTimestamp())
+                        .userId(post.getUser().getId())
+                        .build())
+                .toList();
+    }
+
+
 
 }
