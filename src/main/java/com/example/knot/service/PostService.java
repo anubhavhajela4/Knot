@@ -9,6 +9,8 @@ import com.example.knot.exception.PostNotFoundException;
 import com.example.knot.exception.UserNotFoundException;
 import com.example.knot.repository.PostRepository;
 import com.example.knot.repository.UserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -81,9 +83,11 @@ public class PostService {
         return post.getLikedBy().size();
     }
 
-    public List<PostResponse> getFeed(UUID userId) {
+    public List<PostResponse> getFeed(UUID userId,int page, int size) {
 
-        return postRepository.findFeedPosts(userId)
+        Pageable pageable = PageRequest.of(page, size);
+
+        return postRepository.findFeedPosts(userId, pageable)
                 .stream()
                 .map(post -> PostResponse.builder()
                         .id(post.getId())

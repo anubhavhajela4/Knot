@@ -48,8 +48,10 @@ public class PostController {
     }
 
     @GetMapping("/feed/{userId}")
-    public List<PostResponse> getFeed(@PathVariable UUID userId) {
-        return postService.getFeed(userId);
+    public List<PostResponse> getFeed(@PathVariable UUID userId,
+                                      @RequestParam(defaultValue = "0") int page,
+                                      @RequestParam(defaultValue = "5") int size) {
+        return postService.getFeed(userId, page, size);
     }
 
 }

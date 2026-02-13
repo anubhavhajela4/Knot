@@ -1,6 +1,8 @@
 package com.example.knot.repository;
 
 import com.example.knot.entity.Post;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -19,5 +21,7 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
     )
     ORDER BY p.timestamp DESC
 """)
-    List<Post> findFeedPosts(UUID userId);
+    Page<Post> findFeedPosts(UUID userId, Pageable pageable);
+
+
 }

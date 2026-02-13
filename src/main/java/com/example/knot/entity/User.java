@@ -34,6 +34,8 @@ public class User {
 
     private String bio;
 
+    private String role;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
