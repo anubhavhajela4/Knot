@@ -2,6 +2,7 @@ package com.example.knot.controller;
 
 import com.example.knot.dto.LoginRequest;
 import com.example.knot.dto.SignupRequest;
+import com.example.knot.dto.UserResponse;
 import com.example.knot.entity.User;
 import com.example.knot.exception.UserNotFoundException;
 import com.example.knot.repository.UserRepository;
@@ -27,7 +28,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public String signup(@RequestBody SignupRequest request) {
+    public UserResponse signup(@RequestBody SignupRequest request) {
 
         User user = User.builder()
                 .name(request.getName())
@@ -38,7 +39,12 @@ public class AuthController {
 
         userRepository.save(user);
 
-        return "User registered successfully";
+        return UserResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .bio(user.getBio())
+                .build();
     }
 
 
