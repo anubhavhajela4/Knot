@@ -1,6 +1,5 @@
 package com.example.knot.controller;
 
-import com.example.knot.dto.RegisterUserRequest;
 import com.example.knot.dto.UpdateUserRequest;
 import com.example.knot.dto.UserResponse;
 import com.example.knot.service.UserService;
@@ -20,10 +19,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/register")
-    public UserResponse registerUser(@Valid @RequestBody RegisterUserRequest  request) {
-        return userService.registerUser(request);
-    }
 
     @GetMapping("/{id}")
     public UserResponse getUserById(@PathVariable UUID id) {

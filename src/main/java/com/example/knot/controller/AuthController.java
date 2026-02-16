@@ -1,9 +1,10 @@
 package com.example.knot.controller;
 
+import com.example.knot.dto.AuthResponse;
 import com.example.knot.dto.LoginRequest;
 import com.example.knot.dto.SignupRequest;
-import com.example.knot.dto.UserResponse;
 import com.example.knot.entity.User;
+import com.example.knot.exception.EmailAlreadyExistsException;
 import com.example.knot.exception.UserNotFoundException;
 import com.example.knot.repository.UserRepository;
 import com.example.knot.service.JwtService;
@@ -26,30 +27,33 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
-
+    
     @PostMapping("/signup")
-    public UserResponse signup(@RequestBody SignupRequest request) {
+    public AuthResponse signup(@RequestBody SignupRequest request) {
+
+        String email = request.getEmail();
+        if(userRepository.findByEmail(email).isPresent()) {
+            throw new EmailAlreadyExistsException("User already exists");
+        }
 
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .bio(request.getBio())
                 .role("USER")
                 .build();
 
         userRepository.save(user);
 
-        return UserResponse.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .bio(user.getBio())
+        return AuthResponse.builder()
+                .message("Signup Successful")
                 .build();
     }
 
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
+    public AuthResponse login(@RequestBody LoginRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -60,7 +64,10 @@ public class AuthController {
 
         String token = jwtService.generateToken(user.getId(), user.getRole());
 
-        return token;
+        return AuthResponse.builder()
+                .message("Login Successful")
+                .token(token)
+                .build();
     }
 
 
