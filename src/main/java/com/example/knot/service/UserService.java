@@ -8,6 +8,7 @@ import com.example.knot.exception.NotFollowingException;
 import com.example.knot.exception.UnauthorizedActionException;
 import com.example.knot.exception.UserNotFoundException;
 import com.example.knot.repository.UserRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -87,17 +88,12 @@ public class UserService {
                 .build();
     }
 
-    public void deleteUser(UUID id) {
-
-        UUID userId = getCurrentUserId();
-        if(!userId.equals(id)) {
-            throw new UnauthorizedActionException("Cant delete others profiles");
-        }
-
-        User user = userRepository.findById(id)
-                .orElseThrow(()->new UserNotFoundException("User Not Found"));
-        userRepository.delete(user);
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal")
+    public void deleteUser(UUID userId) {
+        userRepository.deleteById(userId);
     }
+
+
 
     public void followUser(UUID userId, UUID targetId) {
         if(userId.equals(targetId)) {
