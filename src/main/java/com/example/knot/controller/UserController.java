@@ -19,6 +19,10 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("/me")
+    public UserResponse getCurrentUser() {
+        return userService.getCurrentUser();
+    }
 
     @GetMapping("/{id}")
     public UserResponse getUserById(@PathVariable UUID id) {

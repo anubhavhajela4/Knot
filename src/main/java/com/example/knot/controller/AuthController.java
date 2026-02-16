@@ -5,6 +5,7 @@ import com.example.knot.dto.LoginRequest;
 import com.example.knot.dto.SignupRequest;
 import com.example.knot.entity.User;
 import com.example.knot.exception.EmailAlreadyExistsException;
+import com.example.knot.exception.InvalidPasswordException;
 import com.example.knot.exception.UserNotFoundException;
 import com.example.knot.repository.UserRepository;
 import com.example.knot.service.JwtService;
@@ -59,7 +60,7 @@ public class AuthController {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new InvalidPasswordException("Invalid password");
         }
 
         String token = jwtService.generateToken(user.getId(), user.getRole());

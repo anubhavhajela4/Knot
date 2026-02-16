@@ -74,4 +74,22 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
     }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleInvalidPasswordException(InvalidPasswordException ex) {
+        return ErrorResponse.builder()
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ExceptionHandler(UnauthorizedActionException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleUnauthorizedActionException(UnauthorizedActionException ex) {
+        return ErrorResponse.builder()
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 }
