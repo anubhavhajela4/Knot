@@ -9,6 +9,7 @@ import com.example.knot.exception.PostNotFoundException;
 import com.example.knot.exception.UserNotFoundException;
 import com.example.knot.repository.PostRepository;
 import com.example.knot.repository.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,16 +21,20 @@ import java.util.UUID;
 public class PostService {
 
     private final PostRepository postRepository;
-
+    private final ModelMapper modelMapper;
     private final UserRepository userRepository;
 
-    public PostService(PostRepository postRepository, UserRepository userRepository) {
+
+    public PostService(PostRepository postRepository,
+                       UserRepository userRepository,
+                       ModelMapper modelMapper) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
     }
 
     public PostResponse createPost(UUID userId , CreatePostRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(()->new RuntimeException("User Not Found"));
+        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User Not Found"));
         Post post = Post.builder()
                 .content(request.getContent())
                 .user(user)
@@ -45,15 +50,10 @@ public class PostService {
     }
 
     public List<PostResponse> getPostByUser(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(()->new RuntimeException("User Not Found"));
+        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User Not Found"));
         return postRepository.findByUserId(userId)
                 .stream()
-                .map(post -> PostResponse.builder()
-                        .id(post.getId())
-                        .content(post.getContent())
-                        .createdAt(post.getTimestamp())
-                        .userId(user.getId())
-                        .build())
+                .map(post -> modelMapper.map(post, PostResponse.class))
                 .toList();
 
     }
@@ -89,12 +89,7 @@ public class PostService {
 
         return postRepository.findFeedPosts(userId, pageable)
                 .stream()
-                .map(post -> PostResponse.builder()
-                        .id(post.getId())
-                        .content(post.getContent())
-                        .createdAt(post.getTimestamp())
-                        .userId(post.getUser().getId())
-                        .build())
+                .map(post -> modelMapper.map(post, PostResponse.class))
                 .toList();
     }
 

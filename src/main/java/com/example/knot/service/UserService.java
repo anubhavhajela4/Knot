@@ -8,7 +8,7 @@ import com.example.knot.exception.NotFollowingException;
 import com.example.knot.exception.UnauthorizedActionException;
 import com.example.knot.exception.UserNotFoundException;
 import com.example.knot.repository.UserRepository;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -19,22 +19,18 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
-    public UserService (UserRepository userRepository) {
+    public UserService (UserRepository userRepository, ModelMapper modelMapper) {
         this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
     }
 
 
     public UserResponse getCurrentUser() {
         UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-        return UserResponse.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .bio(user.getBio())
-                .createdAt(user.getCreatedAt())
-                .build();
+        return modelMapper.map(user, UserResponse.class);
     }
 
     public UUID getCurrentUserId() {
@@ -43,28 +39,16 @@ public class UserService {
 
     public UserResponse getUserById(UUID id) {
         User user = userRepository.findById(id).orElseThrow(()->new UserNotFoundException("User Not Found"));
-        return UserResponse.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .bio(user.getBio())
-                .createdAt(user.getCreatedAt())
-                .build();
+        return modelMapper.map(user, UserResponse.class);
     }
 
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(user -> UserResponse.builder()
-                        .id(user.getId())
-                        .name(user.getName())
-                        .email(user.getEmail())
-                        .bio(user.getBio())
-                        .createdAt(user.getCreatedAt())
-                        .build()
-                )
+                .map(user -> modelMapper.map(user, UserResponse.class))
                 .toList();
     }
+
 
     public UserResponse updateUser(UUID id, UpdateUserRequest request) {
 
@@ -79,16 +63,9 @@ public class UserService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         User updatedUser = userRepository.save(user);
-        return UserResponse.builder()
-                .id(updatedUser.getId())
-                .name(updatedUser.getName())
-                .email(updatedUser.getEmail())
-                .bio(updatedUser.getBio())
-                .createdAt(updatedUser.getCreatedAt())
-                .build();
+        return modelMapper.map(updatedUser, UserResponse.class);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal")
     public void deleteUser(UUID userId) {
         userRepository.deleteById(userId);
     }
@@ -127,13 +104,7 @@ public class UserService {
                 .orElseThrow(()->new UserNotFoundException("User Not Found"));
         return user.getFollowers()
                 .stream()
-                .map(user1 -> UserResponse.builder()
-                        .id(user1.getId())
-                        .name(user1.getName())
-                        .email(user1.getEmail())
-                        .bio(user1.getBio())
-                        .createdAt(user1.getCreatedAt())
-                        .build())
+                .map(user1 -> modelMapper.map(user1, UserResponse.class))
                 .toList();
     }
 
@@ -142,13 +113,7 @@ public class UserService {
                 .orElseThrow(()->new UserNotFoundException("User Not Found"));
         return user.getFollowing()
                 .stream()
-                .map(user1-> UserResponse.builder()
-                        .id(user1.getId())
-                        .name(user1.getName())
-                        .email(user1.getEmail())
-                        .bio(user1.getBio())
-                        .createdAt(user1.getCreatedAt())
-                        .build())
+                .map(user1 -> modelMapper.map(user1, UserResponse.class))
                 .toList();
     }
 
