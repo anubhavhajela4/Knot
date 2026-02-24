@@ -2,11 +2,13 @@ package com.example.knot.service;
 
 import com.example.knot.dto.CreatePostRequest;
 import com.example.knot.dto.PostResponse;
+import com.example.knot.entity.NotificationType;
 import com.example.knot.entity.Post;
 import com.example.knot.entity.User;
 import com.example.knot.exception.PostAlreadyLikedException;
 import com.example.knot.exception.PostNotFoundException;
 import com.example.knot.exception.UserNotFoundException;
+import com.example.knot.repository.NotificationRepository;
 import com.example.knot.repository.PostRepository;
 import com.example.knot.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -23,14 +25,17 @@ public class PostService {
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
 
     public PostService(PostRepository postRepository,
                        UserRepository userRepository,
-                       ModelMapper modelMapper) {
+                       ModelMapper modelMapper,
+                       NotificationService notificationService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
+        this.notificationService = notificationService;
     }
 
     public PostResponse createPost(UUID userId , CreatePostRequest request) {
@@ -50,7 +55,7 @@ public class PostService {
     }
 
     public List<PostResponse> getPostByUser(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User Not Found"));
+        userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User Not Found"));
         return postRepository.findByUserId(userId)
                 .stream()
                 .map(post -> modelMapper.map(post, PostResponse.class))
@@ -66,6 +71,13 @@ public class PostService {
         }
         post.getLikedBy().add(user);
         postRepository.save(post);
+        notificationService.createNotification(
+                post.getUser(),
+                user,
+                NotificationType.LIKE,
+                post.getId(),
+                null
+        );
     }
 
     public void unlikePost(UUID postId,UUID userId) {

@@ -2,6 +2,7 @@ package com.example.knot.service;
 
 import com.example.knot.dto.UpdateUserRequest;
 import com.example.knot.dto.UserResponse;
+import com.example.knot.entity.NotificationType;
 import com.example.knot.entity.User;
 import com.example.knot.exception.AlreadyFollowingException;
 import com.example.knot.exception.NotFollowingException;
@@ -20,10 +21,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final NotificationService notificationService;
 
-    public UserService (UserRepository userRepository, ModelMapper modelMapper) {
+    public UserService (UserRepository userRepository,
+                        ModelMapper modelMapper,
+                        NotificationService notificationService) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
+        this.notificationService = notificationService;
     }
 
 
@@ -85,6 +90,13 @@ public class UserService {
         }
         user.getFollowing().add(targetUser);
         userRepository.save(user);
+        notificationService.createNotification(
+                user,
+                targetUser,
+                NotificationType.FOLLOW,
+                null,
+                null
+        );
     }
 
     public void unfollowUser(UUID userId, UUID targetId) {

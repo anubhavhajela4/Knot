@@ -4,6 +4,7 @@ package com.example.knot.service;
 import com.example.knot.dto.CommentResponse;
 import com.example.knot.dto.CreateCommentRequest;
 import com.example.knot.entity.Comment;
+import com.example.knot.entity.NotificationType;
 import com.example.knot.entity.Post;
 import com.example.knot.entity.User;
 import com.example.knot.exception.PostNotFoundException;
@@ -20,14 +21,19 @@ import java.util.stream.Collectors;
 
 @Service
 public class CommentService {
-    private CommentRepository commentRepository;
-    private PostRepository postRepository;
-    private UserRepository userRepository;
+    private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
-    public CommentService(CommentRepository commentRepository, PostRepository postRepository, UserRepository userRepository) {
+    public CommentService(CommentRepository commentRepository,
+                          PostRepository postRepository,
+                          UserRepository userRepository,
+                          NotificationService notificationService) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     public CommentResponse createComment(UUID userId, UUID postId, CreateCommentRequest request) {
@@ -39,6 +45,14 @@ public class CommentService {
                 .user(user)
                 .build();
         Comment savedComment = commentRepository.save(comment);
+        notificationService.createNotification(
+                post.getUser(),
+                user,
+                NotificationType.COMMENT,
+                post.getId(),
+                comment.getId()
+        );
+
         return CommentResponse.builder()
                 .id(savedComment.getId())
                 .content(savedComment.getContent())
