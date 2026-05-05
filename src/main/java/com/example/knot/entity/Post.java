@@ -38,9 +38,11 @@ public class Post {
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
+    @Builder.Default
     private Set<User> likedBy = new HashSet<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @Builder.Default
     private Set<Comment> comments = new HashSet<>();
 
 }

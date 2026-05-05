@@ -45,18 +45,23 @@ public class User {
             joinColumns = @JoinColumn(name = "follower_id"),
             inverseJoinColumns = @JoinColumn(name = "following_id")
     )
+    @Builder.Default
     private Set<User> following = new HashSet<>();
 
     @ManyToMany(mappedBy = "following")
+    @Builder.Default
     private Set<User> followers = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @Builder.Default
     private Set<Post> posts = new HashSet<>();
 
     @ManyToMany(mappedBy = "likedBy")
+    @Builder.Default
     private Set<Post> likedPost = new HashSet<>();
 
     @OneToMany(mappedBy =  "user" ,cascade = CascadeType.ALL)
+    @Builder.Default
     private Set<Comment> comments = new HashSet<>();
 
 }

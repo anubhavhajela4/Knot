@@ -34,6 +34,7 @@ public class Circle {
             joinColumns = @JoinColumn(name = "circle_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
+    @Builder.Default
     private Set<User> members = new HashSet<>();
 
     private LocalDateTime createdAt;
