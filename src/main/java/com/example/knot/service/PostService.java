@@ -49,7 +49,7 @@ public class PostService {
         return PostResponse.builder()
                 .id(post.getId())
                 .content(post.getContent())
-                .createdAt(savedPost.getTimestamp())
+                .timestamp(savedPost.getTimestamp())
                 .userId(user.getId())
                 .build();
     }

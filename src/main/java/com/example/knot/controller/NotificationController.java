@@ -25,17 +25,17 @@ public class NotificationController {
             Authentication authentication,
             Pageable pageable
     ) {
-        User currentUser = (User) authentication.getPrincipal();
+        UUID currentUserId = (UUID) authentication.getPrincipal();
         return notificationService.getUserNotifications(
-                currentUser.getId(),
+                currentUserId,
                 pageable
         );
     }
 
     @GetMapping("/unread-count")
     public long getUnreadCount(Authentication authentication) {
-        User currentUser = (User) authentication.getPrincipal();
-        return notificationService.getUnreadCount(currentUser.getId());
+        UUID currentUserId = (UUID) authentication.getPrincipal();
+        return notificationService.getUnreadCount(currentUserId);
     }
 
     @PutMapping("/{id}/read")
@@ -43,14 +43,14 @@ public class NotificationController {
             @PathVariable UUID id,
             Authentication authentication
     ) {
-        User currentUser = (User) authentication.getPrincipal();
-        notificationService.markAsRead(id, currentUser.getId());
+        UUID currentUserId = (UUID) authentication.getPrincipal();
+        notificationService.markAsRead(id, currentUserId);
     }
 
     @PutMapping("/mark-all-read")
     public void markAllAsRead(Authentication authentication) {
-        User currentUser = (User) authentication.getPrincipal();
-        notificationService.markAllAsRead(currentUser.getId());
+        UUID currentUserId = (UUID) authentication.getPrincipal();
+        notificationService.markAllAsRead(currentUserId);
     }
 
 

@@ -11,7 +11,7 @@ public class MapperConfig {
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration()
-                .setMatchingStrategy(org.modelmapper.convention.MatchingStrategies.STRICT);
+                .setMatchingStrategy(org.modelmapper.convention.MatchingStrategies.STANDARD);
         return mapper;
     }
 }

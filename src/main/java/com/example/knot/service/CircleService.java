@@ -33,7 +33,7 @@ public class CircleService {
 
     public CircleResponse createCircle(CreateCircleRequest request, Authentication auth) {
 
-        User creator = userRepository.findByEmail(auth.getName())
+        User creator = userRepository.findById((UUID) auth.getPrincipal())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         Circle circle = Circle.builder()
                 .name(request.getName())
@@ -51,7 +51,7 @@ public class CircleService {
     public void joinCircle(UUID circleId, Authentication auth) {
         Circle circle = circleRepository.findById(circleId).orElseThrow(()->
                 new CircleNotFoundException("Circle Not Found"));
-        User user = userRepository.findByEmail(auth.getName()).orElseThrow(()->
+        User user = userRepository.findById((UUID) auth.getPrincipal()).orElseThrow(()->
                 new UserNotFoundException("User not found"));
 
         if(circle.getMembers().contains(user)) {
@@ -66,7 +66,7 @@ public class CircleService {
         Circle circle = circleRepository.findById(circleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Circle not found"));
 
-        User user = userRepository.findByEmail(auth.getName())
+        User user = userRepository.findById((UUID) auth.getPrincipal())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (!circle.getMembers().contains(user)) {
@@ -90,7 +90,7 @@ public class CircleService {
 
     public List<CircleResponse> getMyCircles(Authentication auth) {
 
-        User user = userRepository.findByEmail(auth.getName())
+        User user = userRepository.findById((UUID) auth.getPrincipal())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return circleRepository.findByMembers_Id(user.getId())
